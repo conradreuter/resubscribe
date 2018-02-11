@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/resubscribe.svg?style=flat-square)](https://www.npmjs.com/package/resubscribe)
 
-Resubscribe is a React utility that for simplifies rendering asynchronous values.
+Resubscribe is a React utility that renders asynchronous values.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
