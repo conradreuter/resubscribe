@@ -53,5 +53,5 @@
     "toc": "Recreate the TOC in the README file"
   },
   "typings": "dist/index.d.ts",
-  "version": "0.0.0"
+  "version": "0.0.1"
 }
