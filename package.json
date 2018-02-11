@@ -1,0 +1,57 @@
+{
+  "author": {
+    "name": "Conrad Reuter",
+    "email": "jacob.conrad.reuter@gmail.com"
+  },
+  "dependencies": {},
+  "description": "Render asynchronous values with React",
+  "devDependencies": {
+    "@types/enzyme": "^3.1.8",
+    "@types/enzyme-adapter-react-16": "^1.0.1",
+    "@types/jest": "^22.1.2",
+    "@types/prop-types": "^15.5.2",
+    "@types/react": "^16.0.36",
+    "@types/react-dom": "^16.0.3",
+    "doctoc": "^1.3.0",
+    "enzyme": "^3.3.0",
+    "enzyme-adapter-react-16": "^1.1.1",
+    "jest": "^22.2.2",
+    "npm-scripts-info": "^0.3.6",
+    "prop-types": "^15.6.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "rimraf": "^2.6.2",
+    "rxjs": "^5.5.6",
+    "ts-jest": "^22.0.3",
+    "typescript": "^2.7.1",
+    "typesync": "^0.2.5"
+  },
+  "main": "dist/index.js",
+  "name": "resubscribe",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": "16.x.x"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/conradreuter/resubscribe.git"
+  },
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist/",
+    "dev": "jest --watch",
+    "info": "npm-scripts-info",
+    "test": "jest",
+    "toc": "doctoc README.md"
+  },
+  "scripts-info": {
+    "build": "Build the library",
+    "clean": "Clean the build directory",
+    "dev": "Run the tests in watch mode",
+    "info": "Print this help",
+    "test": "Run the tests",
+    "toc": "Recreate the TOC in the README file"
+  },
+  "typings": "dist/index.d.ts",
+  "version": "0.0.0"
+}
