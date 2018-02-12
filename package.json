@@ -3,7 +3,9 @@
     "name": "Conrad Reuter",
     "email": "jacob.conrad.reuter@gmail.com"
   },
-  "dependencies": {},
+  "dependencies": {
+    "prop-types": "^15.6.0"
+  },
   "description": "Render asynchronous values with React",
   "devDependencies": {
     "@types/enzyme": "^3.1.8",
@@ -17,7 +19,6 @@
     "enzyme-adapter-react-16": "^1.1.1",
     "jest": "^22.2.2",
     "npm-scripts-info": "^0.3.6",
-    "prop-types": "^15.6.0",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "rimraf": "^2.6.2",
