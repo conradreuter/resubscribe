@@ -119,10 +119,10 @@ const promise = new Promise((resolve, reject) => {
   setTimeout(() => reject(new Error('failed')), 1000)
 })
 
-// renders 'empty' and then 'error: failed' after one second
+// renders 'loading' and then 'error: failed' after one second
 <Subscribe to={promise}>
   {{
-    empty: () => 'empty',
+    loading: () => 'loading',
     next: value => 'value: ' + value,
     error: err => 'error: ' + err.message,
   }}

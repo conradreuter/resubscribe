@@ -13,10 +13,10 @@ describe('<Subscribe /> (Value)', () => {
   let after1: Deferred<void>
   let after2: Deferred<void>
   let wrapper: ShallowWrapper
-  
+
   beforeEach(() => {
     renderer = {
-      empty: jest.fn().mockReturnValue('empty'),
+      loading: jest.fn().mockReturnValue('loading'),
       next: jest.fn().mockImplementation(value => 'next: ' + value.content),
       error: jest.fn().mockReturnValue('error'),
     }
@@ -33,10 +33,10 @@ describe('<Subscribe /> (Value)', () => {
     wrapper = shallow(<Subscribe to={asyncIterator}>{renderer}</Subscribe>)
   })
 
-  it('should render the empty state by default', () => {
+  it('should render the loading state by default', () => {
     // assert
-    expect(renderer.empty).toHaveBeenCalled()
-    expect(wrapper.text()).toBe('empty')
+    expect(renderer.loading).toHaveBeenCalled()
+    expect(wrapper.text()).toBe('loading')
   })
 
   it('should render the next state when the next value arrives', async () => {

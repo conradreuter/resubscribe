@@ -14,27 +14,47 @@ export default class Subscribe<T> extends PureComponent<SubscribeProps<T>, Subsc
     children: PropTypes.oneOfType([
       PropTypes.func,
       PropTypes.shape({
-        empty: PropTypes.func,
-        next: PropTypes.func.isRequired,
+        loading: PropTypes.func,
+        next: PropTypes.func,
         error: PropTypes.func,
       }),
-    ]).isRequired,
+    ]),
     to: PropTypes.any.isRequired,
   }
 
+  private static createRenderer<T>(children: SubscribeProps<T>['children']): SubscribeRenderer<T> {
+    const renderer: SubscribeRenderer<T> = {
+      loading: () => null,
+      next: value => value,
+      error: () => null,
+    }
+    if (!children) return renderer
+    if (typeof children === 'function') {
+      renderer.next = children
+    } else {
+      Object.assign(renderer, children)
+    }
+    return renderer
+  }
+
+  private renderer: SubscribeRenderer<T>
   private subscription: Subscription = Subscription.EMPTY
-  
+
   constructor(props: SubscribeProps<T>) {
     super(props)
-    this.state = { kind: 'empty' }
+    this.renderer = Subscribe.createRenderer(props.children)
+    this.state = { kind: 'loading' }
   }
-  
+
   componentDidMount(): void {
     this.subscribe(this.props.to)
   }
 
   componentWillReceiveProps(nextProps: Readonly<SubscribeProps<T>>): void {
-    if (nextProps.to && nextProps.to !== this.props.to) {
+    if ('children' in nextProps) {
+      this.renderer = Subscribe.createRenderer(nextProps.children)
+    }
+    if ('to' in nextProps && nextProps.to !== this.props.to) {
       this.subscribe(nextProps.to)
     }
   }
@@ -42,9 +62,9 @@ export default class Subscribe<T> extends PureComponent<SubscribeProps<T>, Subsc
   componentWillUnmount(): void {
     this.subscription.unsubscribe()
   }
-  
-  subscribe(to: Subscribable<T>): void {
-    this.setState({ kind: 'empty' })
+
+  private subscribe(to: Subscribable<T>): void {
+    this.setState({ kind: 'loading' })
     this.subscription.unsubscribe()
     this.subscription = subscribe(to, {
       next: (value) => this.setState({ kind: 'next', value }),
@@ -53,26 +73,11 @@ export default class Subscribe<T> extends PureComponent<SubscribeProps<T>, Subsc
   }
 
   render() {
-    const renderer = this.getRenderer()
     switch (this.state.kind) {
-      case 'empty': return renderer.empty()
-      case 'next': return renderer.next(this.state.value)
-      case 'error': return renderer.error(this.state.err)
+      case 'loading': return this.renderer.loading()
+      case 'next': return this.renderer.next(this.state.value)
+      case 'error': return this.renderer.error(this.state.err)
     }
-  }
-
-  getRenderer(): SubscribeRenderer<T> {
-    const renderer: SubscribeRenderer<T> = {
-      empty: () => null,
-      next: () => null,
-      error: () => null,
-    }
-    if (typeof this.props.children === 'function') {
-      renderer.next = this.props.children
-    } else {
-      Object.assign(renderer, this.props.children)
-    }
-    return renderer
   }
 }
 
@@ -82,17 +87,20 @@ export default class Subscribe<T> extends PureComponent<SubscribeProps<T>, Subsc
 export interface SubscribeRenderer<T> {
 
   /**
-   * Render the empty state, i.e. no value has been obtained yet.
+   * Render the loading state, i.e. no value has been obtained yet.
+   * Defaults to `() => null` when missing.
    */
-  empty(): ReactNode
+  loading(): ReactNode
 
   /**
    * Render the next value.
+   * Defaults to `value => value` when missing.
    */
   next(value: T): ReactNode
 
   /**
    * Render an error.
+   * Defaults to `() => null` when missing.
    */
   error(err: any): ReactNode
 }
@@ -101,9 +109,8 @@ export interface SubscribeProps<T> {
 
   /**
    * Renders the asynchronously obtained value.
-   * Missing render functions default to `() => null`.
    */
-  children: SubscribeRenderer<T>['next'] | Partial<SubscribeRenderer<T>>
+  children?: SubscribeRenderer<T>['next'] | Partial<SubscribeRenderer<T>>
 
   /**
    * The source to subscribe to.
@@ -112,7 +119,7 @@ export interface SubscribeProps<T> {
 }
 
 export type SubscribeState<T> = (
-  | { kind: 'empty' }
+  | { kind: 'loading' }
   | { kind: 'next', value: T }
   | { kind: 'error', err: any }
 )
