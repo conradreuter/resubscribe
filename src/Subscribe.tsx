@@ -1,4 +1,4 @@
-import * as PropTypes from 'prop-types'
+import { any, func, oneOfType, node, Requireable, shape } from 'prop-types'
 import { PureComponent, ReactNode } from 'react'
 import Subscribable from './internal/Subscribable'
 import subscribe from './internal/subscribe'
@@ -11,20 +11,47 @@ export default class Subscribe<T> extends PureComponent<SubscribeProps<T>, Subsc
 
   static readonly displayName = 'Subscribe'
   static readonly propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.func,
-      PropTypes.shape({
-        loading: PropTypes.func,
-        next: PropTypes.func,
-        error: PropTypes.func,
+    children: oneOfType([
+      func,
+      shape({
+        loading: func,
+        next: func,
+        error: func,
       }),
     ]),
-    to: PropTypes.any.isRequired,
+    placeholder: node,
+    to: any.isRequired,
   }
 
-  private static createRenderer<T>(children: SubscribeProps<T>['children']): SubscribeRenderer<T> {
+  private renderer: SubscribeRenderer<T>
+  private subscription: Subscription = Subscription.EMPTY
+
+  constructor(props: SubscribeProps<T>) {
+    super(props)
+    this.renderer = this.createRenderer(props.children)
+    this.state = { kind: 'loading' }
+  }
+
+  componentDidMount(): void {
+    this.subscribe(this.props.to)
+  }
+
+  componentWillReceiveProps(nextProps: Readonly<SubscribeProps<T>>): void {
+    if ('children' in nextProps) {
+      this.renderer = this.createRenderer(nextProps.children)
+    }
+    if ('to' in nextProps && nextProps.to !== this.props.to) {
+      this.subscribe(nextProps.to)
+    }
+  }
+
+  componentWillUnmount(): void {
+    this.subscription.unsubscribe()
+  }
+
+  private createRenderer<T>(children: SubscribeProps<T>['children']): SubscribeRenderer<T> {
     const renderer: SubscribeRenderer<T> = {
-      loading: () => null,
+      loading: () => this.props.placeholder || null,
       next: value => value,
       error: () => null,
     }
@@ -35,32 +62,6 @@ export default class Subscribe<T> extends PureComponent<SubscribeProps<T>, Subsc
       Object.assign(renderer, children)
     }
     return renderer
-  }
-
-  private renderer: SubscribeRenderer<T>
-  private subscription: Subscription = Subscription.EMPTY
-
-  constructor(props: SubscribeProps<T>) {
-    super(props)
-    this.renderer = Subscribe.createRenderer(props.children)
-    this.state = { kind: 'loading' }
-  }
-
-  componentDidMount(): void {
-    this.subscribe(this.props.to)
-  }
-
-  componentWillReceiveProps(nextProps: Readonly<SubscribeProps<T>>): void {
-    if ('children' in nextProps) {
-      this.renderer = Subscribe.createRenderer(nextProps.children)
-    }
-    if ('to' in nextProps && nextProps.to !== this.props.to) {
-      this.subscribe(nextProps.to)
-    }
-  }
-
-  componentWillUnmount(): void {
-    this.subscription.unsubscribe()
   }
 
   private subscribe(to: Subscribable<T>): void {
@@ -88,7 +89,7 @@ export interface SubscribeRenderer<T> {
 
   /**
    * Render the loading state, i.e. no value has been obtained yet.
-   * Defaults to `() => null` when missing.
+   * Defaults to `() => this.props.placeholder || null` when missing.
    */
   loading(): ReactNode
 
@@ -111,6 +112,11 @@ export interface SubscribeProps<T> {
    * Renders the asynchronously obtained value.
    */
   children?: SubscribeRenderer<T>['next'] | Partial<SubscribeRenderer<T>>
+
+  /**
+   * The placeholder to be rendered if no loading-renderer is specified.
+   */
+  placeholder?: ReactNode
 
   /**
    * The source to subscribe to.

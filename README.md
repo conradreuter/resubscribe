@@ -112,8 +112,6 @@ Renders the value synchronously.
 
 By default, nothing is rendered when no value has been obtained yet or as soon as an error occurs. This behavior can be customized by passing a renderer object instead of a render function.
 
-All renderer methods are optional and default to rendering nothing.
-
 ```
 const promise = new Promise((resolve, reject) => {
   setTimeout(() => reject(new Error('failed')), 1000)
@@ -129,3 +127,16 @@ const promise = new Promise((resolve, reject) => {
 </Subscribe>
 ```
 
+```
+const promise = new Promise((resolve, reject) => {
+  setTimeout(() => resolve('value', 1000)
+})
+
+// renders 'loading' and then 'value' after one second
+<Subscribe to={promise} placeholder={'loading'} />
+```
+
+All renderer methods are optional and have the following defaults:
+- `loading`: Render the placeholder, or nothing if it does not exist.
+- `next`: Identity, i.e. render the value as-is.
+- `error`: Render nothing.
