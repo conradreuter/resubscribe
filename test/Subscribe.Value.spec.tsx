@@ -1,6 +1,6 @@
 import { shallow, ShallowWrapper } from 'enzyme'
 import * as React from 'react'
-import Subscribe, { SubscribeRenderer } from '~/Subscribe'
+import { Subscribe, SubscribeRenderer } from '~/Subscribe'
 
 describe('<Subscribe /> (Value)', () => {
 
@@ -8,7 +8,7 @@ describe('<Subscribe /> (Value)', () => {
 
   let renderer: jest.Mock<React.ReactNode>
   let wrapper: ShallowWrapper
-  
+
   beforeEach(() => {
     renderer = jest.fn().mockReturnValue('next'),
     wrapper = shallow(<Subscribe to={VALUE}>{renderer}</Subscribe>)

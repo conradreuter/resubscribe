@@ -1,6 +1,6 @@
 import { shallow, ShallowWrapper } from 'enzyme'
 import * as React from 'react'
-import Subscribe, { SubscribeRenderer } from '~/Subscribe'
+import { Subscribe, SubscribeRenderer } from '~/Subscribe'
 import Deferred from './Deferred'
 
 describe('<Subscribe /> (Value)', () => {

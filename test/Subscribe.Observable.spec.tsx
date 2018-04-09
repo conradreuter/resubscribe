@@ -1,7 +1,7 @@
 import { shallow, ShallowWrapper } from 'enzyme'
 import * as React from 'react'
 import { Subject } from 'rxjs'
-import Subscribe, { SubscribeRenderer } from '~/Subscribe'
+import { Subscribe, SubscribeRenderer } from '~/Subscribe'
 
 describe('<Subscribe /> (Observable)', () => {
 

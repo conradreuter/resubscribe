@@ -7,7 +7,7 @@ import Subscription from './internal/Subscription'
 /**
  * Subscribes to a source and asynchronously renders content as soon as a value is available.
  */
-export default class Subscribe<T> extends PureComponent<SubscribeProps<T>, SubscribeState<T>> {
+export class Subscribe<T> extends PureComponent<SubscribeProps<T>, SubscribeState<T>> {
 
   static readonly displayName = 'Subscribe'
   static readonly propTypes = {
