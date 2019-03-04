@@ -39,6 +39,20 @@ describe('subscribe (AsyncIterator)', () => {
     expect(subscriber.next).toHaveBeenCalledWith(VALUE2)
   })
 
+  it('should pass errors to the subscriber', async () => {
+    // act
+    subscribe(asyncIterator, subscriber)
+
+    // arrange
+    const ERROR = new Error()
+    deferred1.reject(ERROR)
+    await deferred1.promise.catch(() => {})
+    await new Promise(resolve => resolve())
+
+    // assert
+    expect(subscriber.error).toHaveBeenCalledWith(ERROR)
+  })
+
   it('should complete the subscriber after all values have been passed', async () => {
     // act
     subscribe(asyncIterator, subscriber)
@@ -47,6 +61,7 @@ describe('subscribe (AsyncIterator)', () => {
     deferred1.resolve(VALUE1)
     deferred2.resolve(VALUE2)
     await end.promise
+    await new Promise(resolve => resolve())
 
     // assert
     expect(subscriber.complete).toHaveBeenCalled()

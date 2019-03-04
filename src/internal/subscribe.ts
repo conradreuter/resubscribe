@@ -63,15 +63,22 @@ function subscribeToAsyncIterator<T>(
   fetchNext()
   return {unsubscribe}
 
-  function fetchNext() {
-    asyncIterator.next().then(result => {
-      if (result.done) {
-        subscriber.complete()
-        return
-      }
-      fetchNext()
-      subscriber.next(result.value)
-    })
+  async function fetchNext() {
+    let result
+    try {
+      result = await asyncIterator.next()
+    } catch (err) {
+      subscriber.error(err)
+      return
+    }
+
+    if (result.done) {
+      subscriber.complete()
+      return
+    }
+
+    fetchNext()
+    subscriber.next(result.value)
   }
 
   function unsubscribe() {
