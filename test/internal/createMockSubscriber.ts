@@ -1,4 +1,4 @@
-import Subscriber from '~/internal/Subscriber'
+import {Subscriber} from '~/internal/types'
 
 function createMockSubscriber(): Subscriber<any> {
   return {
@@ -8,4 +8,4 @@ function createMockSubscriber(): Subscriber<any> {
   }
 }
 
-export default createMockSubscriber
+export {createMockSubscriber}

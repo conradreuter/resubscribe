@@ -1,8 +1,8 @@
 import {Subject} from 'rxjs'
 
-import subscribe from '~/internal/subscribe'
-import Subscriber from '~/internal/Subscriber'
-import createMockSubscriber from './createMockSubscriber'
+import {subscribe} from '~/internal/subscribe'
+import {Subscriber} from '~/internal/types'
+import {createMockSubscriber} from './createMockSubscriber'
 
 describe('subscribe (Observable)', () => {
   const VALUE1 = {value: '1'}

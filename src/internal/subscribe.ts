@@ -1,6 +1,5 @@
-import Subscribable, {Observable} from './Subscribable'
-import Subscriber from './Subscriber'
-import Subscription from './Subscription'
+import {Observable} from './Observable'
+import {Subscribable, Subscriber, Subscription} from './types'
 
 /**
  * Subscribe something that can be subscribed to into a unified interface.
@@ -92,4 +91,4 @@ function subscribeToValue<T>(value: T, subscriber: Subscriber<T>): Subscription 
   return Subscription.EMPTY // value is delivered immediately
 }
 
-export default subscribe
+export {subscribe}

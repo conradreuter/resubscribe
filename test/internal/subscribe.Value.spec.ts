@@ -1,6 +1,6 @@
-import subscribe from '~/internal/subscribe'
-import Subscriber from '~/internal/Subscriber'
-import createMockSubscriber from './createMockSubscriber'
+import {subscribe} from '~/internal/subscribe'
+import {Subscriber} from '~/internal/types'
+import {createMockSubscriber} from './createMockSubscriber'
 
 describe('subscribe (Value)', () => {
   const VALUE = {}

@@ -1,8 +1,8 @@
 import {shallow, ShallowWrapper} from 'enzyme'
 import * as React from 'react'
 
-import Subscribe, {SubscribeRenderer} from '~/Subscribe'
-import Deferred from './Deferred'
+import {Subscribe, SubscribeRenderer} from '~/Subscribe'
+import {Deferred} from './Deferred'
 
 describe('<Subscribe /> (Promise)', () => {
   let renderer: {[P in keyof SubscribeRenderer<{}>]: jest.Mock<React.ReactNode>}

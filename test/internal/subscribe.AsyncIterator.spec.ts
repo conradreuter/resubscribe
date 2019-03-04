@@ -1,7 +1,7 @@
-import subscribe from '~/internal/subscribe'
-import Subscriber from '~/internal/Subscriber'
-import Deferred from '../Deferred'
-import createMockSubscriber from './createMockSubscriber'
+import {subscribe} from '~/internal/subscribe'
+import {Subscriber} from '~/internal/types'
+import {Deferred} from '../Deferred'
+import {createMockSubscriber} from './createMockSubscriber'
 
 describe('subscribe (AsyncIterator)', () => {
   const VALUE1 = {value: '1'}

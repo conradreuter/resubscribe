@@ -1,2 +1,4 @@
-/dist/
+/.rpt2_cache
+/dist/index.js
+/dist/index.es.js
 /node_modules/

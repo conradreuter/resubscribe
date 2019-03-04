@@ -1,9 +1,8 @@
 import * as PropTypes from 'prop-types'
 import {PureComponent, ReactNode} from 'react'
 
-import Subscribable from './internal/Subscribable'
-import subscribe from './internal/subscribe'
-import Subscription from './internal/Subscription'
+import {subscribe} from './internal/subscribe'
+import {Subscribable, Subscription} from './internal/types'
 
 /**
  * Subscribes to a source and asynchronously renders content as soon as a value is available.
@@ -128,5 +127,4 @@ interface SubscribeProps<T> {
 
 type SubscribeState<T> = {kind: 'loading'} | {kind: 'next'; value: T} | {kind: 'error'; err: any}
 
-export default Subscribe
-export {SubscribeProps, SubscribeRenderer, SubscribeState}
+export {Subscribe, SubscribeProps, SubscribeRenderer, SubscribeState}

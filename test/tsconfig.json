@@ -2,11 +2,9 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "baseUrl": "..",
-    "moduleResolution": "node",
     "paths": {
       "~/*": ["./src/*"]
-    },
-    "target": "esnext"
+    }
   },
   "include": ["."]
 }
