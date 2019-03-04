@@ -2,3 +2,5 @@
 /test/
 /jest.config.js
 /tsconfig.json
+/.prettierrc
+/.nvmrc
