@@ -1,14 +1,11 @@
-import Subscribable, { Observable } from './Subscribable'
+import Subscribable, {Observable} from './Subscribable'
 import Subscriber from './Subscriber'
 import Subscription from './Subscription'
 
 /**
  * Subscribe something that can be subscribed to into a unified interface.
  */
-export default function subscribe<T>(
-  source: Subscribable<T>,
-  subscriber: Subscriber<T>,
-): Subscription {
+function subscribe<T>(source: Subscribable<T>, subscriber: Subscriber<T>): Subscription {
   if (isObservable(source)) return subscribeToObservable(source, subscriber)
   if (isPromise(source)) return subscribeToPromise(source, subscriber)
   if (isAsyncIterator(source)) return subscribeToAsyncIterator(source, subscriber)
@@ -16,10 +13,11 @@ export default function subscribe<T>(
 }
 
 function isObservable<T>(source: Subscribable<T>): source is Observable<T> {
-  return (true
-    && !!source
-    && typeof source === 'object'
-    && typeof (source as any).subscribe === 'function'
+  return (
+    true &&
+    !!source &&
+    typeof source === 'object' &&
+    typeof (source as any).subscribe === 'function'
   )
 }
 
@@ -28,30 +26,33 @@ function subscribeToObservable<T>(
   subscriber: Subscriber<T>,
 ): Subscription {
   const subscription = observable.subscribe(subscriber)
-  return { unsubscribe: () => subscription.unsubscribe() }
+  const unsubscribe = () => subscription.unsubscribe()
+  return {unsubscribe}
 }
 
 function isPromise<T>(subscribable: Subscribable<T>): subscribable is Promise<T> {
-  return (true
-    && !!subscribable
-    && typeof subscribable === 'object'
-    && typeof (subscribable as any).then === 'function'
+  return (
+    true &&
+    !!subscribable &&
+    typeof subscribable === 'object' &&
+    typeof (subscribable as any).then === 'function'
   )
 }
 
-function subscribeToPromise<T>(
-  promise: Promise<T>,
-  subscriber: Subscriber<T>,
-): Subscription {
-  promise.then(subscriber.next, subscriber.error)
+function subscribeToPromise<T>(promise: Promise<T>, subscriber: Subscriber<T>): Subscription {
+  promise.then(value => {
+    subscriber.next(value)
+    subscriber.complete()
+  }, subscriber.error)
   return Subscription.EMPTY // Promises are not cancellable ):
 }
 
 function isAsyncIterator<T>(subscribable: Subscribable<T>): subscribable is AsyncIterator<T> {
-  return (true
-    && !!subscribable
-    && typeof subscribable === 'object'
-    && typeof (subscribable as any).next === 'function'
+  return (
+    true &&
+    !!subscribable &&
+    typeof subscribable === 'object' &&
+    typeof (subscribable as any).next === 'function'
   )
 }
 
@@ -60,11 +61,14 @@ function subscribeToAsyncIterator<T>(
   subscriber: Subscriber<T>,
 ): Subscription {
   fetchNext()
-  return { unsubscribe }
-  
+  return {unsubscribe}
+
   function fetchNext() {
     asyncIterator.next().then(result => {
-      if (result.done) return
+      if (result.done) {
+        subscriber.complete()
+        return
+      }
       fetchNext()
       subscriber.next(result.value)
     })
@@ -75,10 +79,10 @@ function subscribeToAsyncIterator<T>(
   }
 }
 
-function subscribeToValue<T>(
-  value: T,
-  subscriber: Subscriber<T>,
-): Subscription {
+function subscribeToValue<T>(value: T, subscriber: Subscriber<T>): Subscription {
   subscriber.next(value)
+  subscriber.complete()
   return Subscription.EMPTY // value is delivered immediately
 }
+
+export default subscribe

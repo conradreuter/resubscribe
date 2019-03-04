@@ -1,17 +1,18 @@
-import { Subject } from 'rxjs'
+import {Subject} from 'rxjs'
+
 import subscribe from '~/internal/subscribe'
 import Subscriber from '~/internal/Subscriber'
+import createMockSubscriber from './createMockSubscriber'
 
 describe('subscribe (Observable)', () => {
-  
-  const VALUE1 = { value: '1' }
-  const VALUE2 = { value: '2' }
-  
+  const VALUE1 = {value: '1'}
+  const VALUE2 = {value: '2'}
+
   let subscriber: Subscriber<{}>
   let subject: Subject<{}>
-  
+
   beforeEach(() => {
-    subscriber = { next: jest.fn(), error: jest.fn() }
+    subscriber = createMockSubscriber()
     subject = new Subject()
   })
 
@@ -43,7 +44,7 @@ describe('subscribe (Observable)', () => {
   it('should close the subscription when unsubscribing', () => {
     // act
     const subscription = subscribe(subject.asObservable(), subscriber)
-    
+
     // assert
     expect(subject.observers).toHaveLength(1)
 
@@ -64,5 +65,16 @@ describe('subscribe (Observable)', () => {
 
     // assert
     expect(subscriber.next).not.toHaveBeenCalled()
+  })
+
+  it('should complete the subscriber when the source completes', () => {
+    // act
+    subscribe(subject.asObservable(), subscriber)
+
+    // arrange
+    subject.complete()
+
+    // assert
+    expect(subscriber.complete).toHaveBeenCalled()
   })
 })

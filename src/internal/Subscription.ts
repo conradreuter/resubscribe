@@ -6,11 +6,10 @@ interface Subscription {
 }
 
 namespace Subscription {
-
   /**
    * An empty subscription.
    */
-  export const EMPTY: Subscription = { unsubscribe() {} }
+  export const EMPTY: Subscription = {unsubscribe: () => {}}
 }
 
 export default Subscription

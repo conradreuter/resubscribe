@@ -1,11 +1,11 @@
-import { shallow, ShallowWrapper } from 'enzyme'
+import {shallow, ShallowWrapper} from 'enzyme'
 import * as React from 'react'
-import { Subscribe, SubscribeRenderer } from '~/Subscribe'
+
+import Subscribe, {SubscribeRenderer} from '~/Subscribe'
 import Deferred from './Deferred'
 
 describe('<Subscribe /> (Promise)', () => {
-
-  let renderer: { [P in keyof SubscribeRenderer<{}>]: jest.Mock<React.ReactNode> }
+  let renderer: {[P in keyof SubscribeRenderer<{}>]: jest.Mock<React.ReactNode>}
   let deferred: Deferred<{}>
   let wrapper: ShallowWrapper
 
@@ -15,7 +15,7 @@ describe('<Subscribe /> (Promise)', () => {
       next: jest.fn().mockReturnValue('next'),
       error: jest.fn().mockReturnValue('error'),
     }
-    deferred = new Deferred
+    deferred = new Deferred()
     wrapper = shallow(<Subscribe to={deferred.promise}>{renderer}</Subscribe>)
   })
 

@@ -1,11 +1,10 @@
 /**
  * A deferred value, i.e. a promise that can be externally resolved or rejected.
  */
-export default class Deferred<T> {
-
+class Deferred<T> {
   public constructor() {
     this.promise = new Promise((resolve, reject) => {
-      Object.assign(this, { resolve, reject })
+      Object.assign(this, {resolve, reject})
     })
   }
 
@@ -28,3 +27,5 @@ export default class Deferred<T> {
     throw new Error('wtf') // method is overridden in constructor
   }
 }
+
+export default Deferred

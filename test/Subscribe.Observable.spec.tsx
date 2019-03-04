@@ -1,13 +1,13 @@
-import { shallow, ShallowWrapper } from 'enzyme'
+import {shallow, ShallowWrapper} from 'enzyme'
 import * as React from 'react'
-import { Subject } from 'rxjs'
-import { Subscribe, SubscribeRenderer } from '~/Subscribe'
+import {Subject} from 'rxjs'
+
+import Subscribe, {SubscribeRenderer} from '~/Subscribe'
 
 describe('<Subscribe /> (Observable)', () => {
+  type Value = {content: number}
 
-  type Value = { content: number }
-
-  let renderer: { [P in keyof SubscribeRenderer<Value>]: jest.Mock<React.ReactNode> }
+  let renderer: {[P in keyof SubscribeRenderer<Value>]: jest.Mock<React.ReactNode>}
   let subject: Subject<Value>
   let wrapper: ShallowWrapper
 
@@ -17,7 +17,7 @@ describe('<Subscribe /> (Observable)', () => {
       next: jest.fn().mockImplementation(value => 'next: ' + value.content),
       error: jest.fn().mockReturnValue('error'),
     }
-    subject = new Subject
+    subject = new Subject()
     wrapper = shallow(<Subscribe to={subject.asObservable()}>{renderer}</Subscribe>)
   })
 
@@ -29,7 +29,7 @@ describe('<Subscribe /> (Observable)', () => {
 
   it('should render the next state when the next value arrives', async () => {
     // arrange
-    const VALUE = { content: 0 }
+    const VALUE = {content: 0}
     subject.next(VALUE)
 
     // assert
@@ -39,8 +39,8 @@ describe('<Subscribe /> (Observable)', () => {
 
   it('should render the last value that arrived', async () => {
     // arrange
-    subject.next({ content: 1 })
-    subject.next({ content: 2 })
+    subject.next({content: 1})
+    subject.next({content: 2})
 
     // assert
     expect(wrapper.update().text()).toBe('next: 2')
