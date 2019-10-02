@@ -6,6 +6,7 @@ Resubscribe is a React utility that renders asynchronous values.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+
 ## Table of Contents
 
 - [Installation](#installation)
@@ -28,10 +29,11 @@ npm install resubscribe
 ## Supported Concepts
 
 The following asynchronous concepts are supported out-of-the-box:
+
 - [Promises](https://promisesaplus.com/)
 - [Observables](https://github.com/tc39/proposal-observable)
 - [Async Iterators](https://github.com/tc39/proposal-async-iteration)
--  synchronous values
+- synchronous values
 
 ## Usage
 
@@ -43,6 +45,15 @@ The `<Subscribe />`-component needs a source to subscribe to - whch can be [anyt
 <Subscribe to={source}>
   {value => <div>{value}</div>}
 </Subscribe>
+```
+
+Additionally, a `useSubscribable` hook is provided, so you don't have to rely on the render prop implementation:
+
+```
+const state = useSubscribable(source)
+if (state.kind === 'loading') return 'Loading'
+if (state.kind === 'error') return 'error'
+if (state.kind === 'next') return 'Value: ' + state.value
 ```
 
 ### With Promises
@@ -88,7 +99,7 @@ const asyncIterator = (async function*() {
     // sleep for one second
     await new Promise(resolve => setTimeout(resolve, 1000))
   }
-})
+})()
 
 // renders <div>X</div>
 // X starts at 0 and is incremented every second
@@ -137,6 +148,7 @@ const promise = new Promise((resolve, reject) => {
 ```
 
 All renderer methods are optional and have the following defaults:
+
 - `loading`: Render the placeholder, or nothing if it does not exist.
 - `next`: Identity, i.e. render the value as-is.
 - `error`: Render nothing.

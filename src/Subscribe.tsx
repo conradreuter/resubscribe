@@ -1,89 +1,63 @@
 import * as PropTypes from 'prop-types'
-import {PureComponent, ReactNode} from 'react'
+import React, {ReactNode} from 'react'
 
-import {subscribe} from './internal/subscribe'
-import {Subscribable, Subscription} from './internal/types'
+import {useSubscribable} from './useSubscribable'
+import {Subscribable} from './internal/types'
+
+function createRenderer<T>(
+  options: Pick<SubscribeProps<T>, 'children' | 'placeholder'>,
+): SubscribeRenderer<T> {
+  const {placeholder, children} = options
+  const renderer: SubscribeRenderer<T> = {
+    loading: () => placeholder || null,
+    next: value => value,
+    error: () => null,
+  }
+  if (!children) return renderer
+  if (typeof children === 'function') {
+    renderer.next = children as any
+  } else {
+    Object.assign(renderer, children)
+  }
+  return renderer
+}
 
 /**
  * Subscribes to a source and asynchronously renders content as soon as a value is available.
  */
-class Subscribe<T> extends PureComponent<SubscribeProps<T>, SubscribeState<T>> {
-  static readonly displayName = 'Subscribe'
-  static readonly propTypes = {
-    children: PropTypes.oneOfType([
-      PropTypes.func,
-      PropTypes.shape({
-        loading: PropTypes.func,
-        next: PropTypes.func,
-        error: PropTypes.func,
-      }),
-    ]),
-    placeholder: PropTypes.node,
-    to: PropTypes.any.isRequired,
-  }
+function InternalSubscribe<T>(props: SubscribeProps<T>) {
+  const subscriptionState = useSubscribable(props.to)
+  const renderer = createRenderer(props)
 
-  private renderer: SubscribeRenderer<T>
-  private subscription: Subscription = Subscription.EMPTY
-
-  constructor(props: SubscribeProps<T>) {
-    super(props)
-    this.renderer = this.createRenderer(props.children)
-    this.state = {kind: 'loading'}
-  }
-
-  componentDidMount(): void {
-    this.subscribe(this.props.to)
-  }
-
-  componentWillReceiveProps(nextProps: Readonly<SubscribeProps<T>>): void {
-    if ('children' in nextProps) {
-      this.renderer = this.createRenderer(nextProps.children)
-    }
-    if ('to' in nextProps && nextProps.to !== this.props.to) {
-      this.subscribe(nextProps.to)
-    }
-  }
-
-  componentWillUnmount(): void {
-    this.subscription.unsubscribe()
-  }
-
-  private createRenderer<T>(children: SubscribeProps<T>['children']): SubscribeRenderer<T> {
-    const renderer: SubscribeRenderer<T> = {
-      loading: () => this.props.placeholder || null,
-      next: value => value,
-      error: () => null,
-    }
-    if (!children) return renderer
-    if (typeof children === 'function') {
-      renderer.next = children
-    } else {
-      Object.assign(renderer, children)
-    }
-    return renderer
-  }
-
-  private subscribe(to: Subscribable<T>): void {
-    this.setState({kind: 'loading'})
-    this.subscription.unsubscribe()
-    this.subscription = subscribe(to, {
-      next: value => this.setState({kind: 'next', value}),
-      error: err => this.setState({kind: 'error', err}),
-      complete: () => {},
-    })
-  }
-
-  render() {
-    switch (this.state.kind) {
-      case 'loading':
-        return this.renderer.loading()
-      case 'next':
-        return this.renderer.next(this.state.value)
-      case 'error':
-        return this.renderer.error(this.state.err)
-    }
+  switch (subscriptionState.kind) {
+    case 'loading':
+      return <>{renderer.loading()}</>
+    case 'next':
+      return <>{renderer.next(subscriptionState.value)}</>
+    case 'error':
+      return <>{renderer.error(subscriptionState.err)}</>
+    default:
+      let _never: never = subscriptionState
+      throw new Error('Unkown subscription state: ' + _never)
   }
 }
+
+InternalSubscribe.propTypes = {
+  children: PropTypes.oneOfType([
+    PropTypes.func,
+    PropTypes.shape({
+      loading: PropTypes.func,
+      next: PropTypes.func,
+      error: PropTypes.func,
+    }),
+  ]),
+  placeholder: PropTypes.node,
+  to: PropTypes.any.isRequired,
+}
+
+const Subscribe = React.memo(InternalSubscribe) as <T>(
+  props: SubscribeProps<T>,
+) => JSX.Element | null
 
 /**
  * Renders asynchronously obtained values.
@@ -125,6 +99,4 @@ interface SubscribeProps<T> {
   to: Subscribable<T>
 }
 
-type SubscribeState<T> = {kind: 'loading'} | {kind: 'next'; value: T} | {kind: 'error'; err: any}
-
-export {Subscribe, SubscribeProps, SubscribeRenderer, SubscribeState}
+export {Subscribe, SubscribeProps, SubscribeRenderer}

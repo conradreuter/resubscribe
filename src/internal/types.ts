@@ -1,9 +1,11 @@
+import {Observable as RXObservabje} from 'rxjs'
+
 import {Observable} from './Observable'
 
 /**
  * Something that can be subscribed to.
  */
-type Subscribable<T> = Observable<T> | Promise<T> | AsyncIterator<T> | T
+type Subscribable<T> = RXObservabje<T> | Observable<T> | Promise<T> | AsyncIterator<T> | T
 
 /**
  * A subscription than can be unsubscribed from.

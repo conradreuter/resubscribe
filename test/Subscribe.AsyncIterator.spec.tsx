@@ -1,10 +1,11 @@
-import {shallow, ShallowWrapper} from 'enzyme'
+import {mount, ReactWrapper} from 'enzyme'
 import * as React from 'react'
+import {act} from 'react-dom/test-utils'
 
 import {Subscribe, SubscribeRenderer} from '~/Subscribe'
 import {Deferred} from './Deferred'
 
-describe('<Subscribe /> (Value)', () => {
+describe('<Subscribe /> (AsyncIterator)', () => {
   type Value = {content: number}
 
   let renderer: {[P in keyof SubscribeRenderer<Value>]: jest.Mock<React.ReactNode>}
@@ -12,7 +13,7 @@ describe('<Subscribe /> (Value)', () => {
   let deferred2: Deferred<Value>
   let after1: Deferred<void>
   let after2: Deferred<void>
-  let wrapper: ShallowWrapper
+  let wrapper: ReactWrapper
 
   beforeEach(() => {
     renderer = {
@@ -30,7 +31,7 @@ describe('<Subscribe /> (Value)', () => {
       yield await deferred2.promise
       after2.resolve(undefined)
     })()
-    wrapper = shallow(<Subscribe to={asyncIterator}>{renderer}</Subscribe>)
+    wrapper = mount(<Subscribe to={asyncIterator}>{renderer}</Subscribe>)
   })
 
   it('should render the loading state by default', () => {
@@ -42,8 +43,12 @@ describe('<Subscribe /> (Value)', () => {
   it('should render the next state when the next value arrives', async () => {
     // arrange
     const VALUE = {content: 0}
-    deferred1.resolve(VALUE)
-    await after1.promise
+
+    // act
+    await act(async () => {
+      deferred1.resolve(VALUE)
+      await after1.promise
+    })
 
     // assert
     expect(renderer.next).toHaveBeenCalledWith(VALUE)
@@ -51,10 +56,12 @@ describe('<Subscribe /> (Value)', () => {
   })
 
   it('should render the last value that arrived', async () => {
-    // arrange
-    deferred1.resolve({content: 1})
-    deferred2.resolve({content: 2})
-    await after2.promise
+    // act
+    await act(async () => {
+      deferred1.resolve({content: 1})
+      deferred2.resolve({content: 2})
+      await after2.promise
+    })
 
     // assert
     expect(wrapper.update().text()).toBe('next: 2')
