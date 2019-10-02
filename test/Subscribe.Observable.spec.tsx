@@ -1,5 +1,6 @@
-import {shallow, ShallowWrapper} from 'enzyme'
+import {mount, ReactWrapper} from 'enzyme'
 import * as React from 'react'
+import {act} from 'react-dom/test-utils'
 import {Subject} from 'rxjs'
 
 import {Subscribe, SubscribeRenderer} from '~/Subscribe'
@@ -9,7 +10,7 @@ describe('<Subscribe /> (Observable)', () => {
 
   let renderer: {[P in keyof SubscribeRenderer<Value>]: jest.Mock<React.ReactNode>}
   let subject: Subject<Value>
-  let wrapper: ShallowWrapper
+  let wrapper: ReactWrapper
 
   beforeEach(() => {
     renderer = {
@@ -17,8 +18,9 @@ describe('<Subscribe /> (Observable)', () => {
       next: jest.fn().mockImplementation(value => 'next: ' + value.content),
       error: jest.fn().mockReturnValue('error'),
     }
+
     subject = new Subject()
-    wrapper = shallow(<Subscribe to={subject.asObservable()}>{renderer}</Subscribe>)
+    wrapper = mount(<Subscribe to={subject.asObservable()}>{renderer}</Subscribe>)
   })
 
   it('should render the loading state by default', () => {
@@ -30,7 +32,11 @@ describe('<Subscribe /> (Observable)', () => {
   it('should render the next state when the next value arrives', async () => {
     // arrange
     const VALUE = {content: 0}
-    subject.next(VALUE)
+
+    // act
+    act(() => {
+      subject.next(VALUE)
+    })
 
     // assert
     expect(renderer.next).toHaveBeenCalledWith(VALUE)
@@ -38,9 +44,11 @@ describe('<Subscribe /> (Observable)', () => {
   })
 
   it('should render the last value that arrived', async () => {
-    // arrange
-    subject.next({content: 1})
-    subject.next({content: 2})
+    // act
+    act(() => {
+      subject.next({content: 1})
+      subject.next({content: 2})
+    })
 
     // assert
     expect(wrapper.update().text()).toBe('next: 2')
@@ -49,7 +57,11 @@ describe('<Subscribe /> (Observable)', () => {
   it('should render the error state when the observable throws', async () => {
     // arrange
     const ERROR = new Error()
-    subject.error(ERROR)
+
+    // act
+    act(() => {
+      subject.error(ERROR)
+    })
 
     // assert
     expect(renderer.error).toHaveBeenCalledWith(ERROR)
